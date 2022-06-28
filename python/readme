@@ -1,0 +1,7 @@
+Create guideseq environment 
+conda create -n guideseq -c conda-forge -c bioconda -c anaconda -c tsailabSJ guide_seq
+
+Activate guideseq conda environment
+conda activate guideseq
+
+

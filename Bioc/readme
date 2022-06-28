@@ -1,0 +1,35 @@
+Steps for analyzing GUIDE-Seq data for off-target analysis using Bioconductor package:
+Required inputs: 1. Alignment file 2. UMI file 3. gRNA fasta file
+Ex: create using text editor:
+> gRNA_name
+GGGAAAGACCCAGCATCCGT
+
+Link to the reference genome:
+UMASS UCSC Ref
+https://www.dropbox.com/sh/5771zfwnoo4qymd/AAA_k_-NdNUNDpRc7Drf9Yk3a?dl=0
+
+1. Activate GUIDE-seq conda environment:
+        conda activate guideseq
+
+2. Generate input files and run GUIDE-Seq function:
+Note: The number of threads used are 2. Can edit this manually for larger machines.
+
+        1. Alignment to UCSC hg38 reference and indexing:
+        ./generate_bwa_new.sh <sample prefix>
+
+Note: sample names should be named as: <sample prefix>.r1.fastq and <sample prefix>.r2.fastq
+Ex:  bwa mem -t 2 version0.6.0/genome.fa  HEKSite1Rep1.r1.fastq  HEKSite1Rep1.r2.fastq | samtools view -Sb -@ 2 - | samtools sort -@ 2 - >  HEKSite1Rep1.new.bam
+samtools index HEKSite1Rep1.new.bam
+
+	2. Generate umi file ( R script):
+        Rscript generate_umi.sh <sample prefix>
+Note: sample names should be named as: <sample prefix>.r2.fastq
+
+        3. Run GUIDEseq Bioconductor tool for each sample:
+        Rscript guideseq_bioc_pipeline.R <umi file> <bam file> <output prefix>
+
+Note:
+        1. For biological replicates, use inputs as:
+                bamfile <- c("HEKSite1Rep1.new.bam", "HEKSite1Rep2.new.bam")
+                umifile <- c("HEKSite1Rep1_umi.txt" , HEKSite1Rep2_umi.txt" )
+        2. For technical replicates, merge BAM files using samtools.
